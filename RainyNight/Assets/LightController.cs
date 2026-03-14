@@ -5,6 +5,7 @@ using UnityEngine;
 public class LightController : MonoBehaviour
 {
     private Light _light;
+    public float intensity;
     // Start is called before the first frame update
     void Start()
     {
@@ -14,6 +15,7 @@ public class LightController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        _light.intensity = 2f*(5f*Mathf.Sin(100f* Time.deltaTime )+20f);
+        intensity = 20*Mathf.Sin(2f*Time.fixedTime+5f)+30f;
+        _light.intensity = intensity;
     }
 }

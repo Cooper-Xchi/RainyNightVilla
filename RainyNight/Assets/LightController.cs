@@ -15,7 +15,7 @@ public class LightController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        intensity = 20*Mathf.Sin(2f*Time.fixedTime+5f)+30f;
+        intensity = 5*Mathf.Sin(1f*Time.fixedTime+5f)+6f;
         _light.intensity = intensity;
     }
 }

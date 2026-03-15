@@ -98,8 +98,8 @@ Shader "Custom/URP/WaterSurfaceMist"
 
                 VertexPositionInputs posInputs = GetVertexPositionInputs(input.positionOS.xyz);
                 VertexNormalInputs normalInputs = GetVertexNormalInputs(input.normalOS);
-
-                output.positionHCS = posInputs.positionCS;
+                posInputs.positionWS.y += para.w*(sin(para.x*_Time.y+para.y*posInputs.positionWS.z)+1.0);
+                output.positionHCS = TransformWorldToHClip(posInputs.positionWS);
                 output.positionWS = posInputs.positionWS;
                 output.normalWS = normalize(normalInputs.normalWS);
                 output.uv = input.uv;

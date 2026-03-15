@@ -2,6 +2,7 @@ Shader "Custom/ForegroundCamera"
 {
     Properties
     {
+        _MainTex("MainTex", 2D) = "white" {}
         _ForegroundTex("_ForegroundTex", 2D) = "white" {}
         _BaseColor("Base Color", Color) = (1,1,1,1)
 
@@ -15,17 +16,24 @@ Shader "Custom/ForegroundCamera"
     {
         Tags
         {
-            "RenderType"="Opaque"
-            "Queue"="Geometry"
+            "RenderType"="Transparent"
+            "Queue"="Transparent"
             "RenderPipeline"="UniversalPipeline"
         }
+
 
         Pass
         {
             Name "ForwardUnlit"
-            Tags { "LightMode"="UniversalForward" }
+
+            Blend SrcAlpha OneMinusSrcAlpha
+            ZWrite Off
+            Cull Off
+            ZTest LEqual
 
             HLSLPROGRAM
+
+
 
             #pragma vertex Vert
             #pragma fragment Frag
@@ -82,7 +90,7 @@ Shader "Custom/ForegroundCamera"
 
             half4 Frag(Varyings input) : SV_Target
             {
-                float4 col = SAMPLE_TEXTURE2D(_ForegroundTex, sampler_ForegroundTex, input.uv*para.xy+para.zw);
+                float4 col = SAMPLE_TEXTURE2D(_ForegroundTex, sampler_ForegroundTex, input.uv);
                 // col *= _BaseColor;
 
                 // // 亮度提取
@@ -96,7 +104,7 @@ Shader "Custom/ForegroundCamera"
                 // // 示例：整体强度
                 // col.rgb *= _Intensity;
 
-                return col;
+                return float4(col.rgb*para.x,1);
             }
 
             ENDHLSL

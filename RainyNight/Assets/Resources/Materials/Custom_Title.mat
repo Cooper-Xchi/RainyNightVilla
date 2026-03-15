@@ -33,5 +33,5 @@ Material:
     - _Intensity: 0.782
     m_Colors:
     - _BaseColor: {r: 1, g: 0, b: 0, a: 1}
-    - para: {r: 0, g: 1, b: 1, a: 1}
+    - para: {r: 0.67, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []

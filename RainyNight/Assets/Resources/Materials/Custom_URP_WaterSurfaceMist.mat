@@ -33,15 +33,15 @@ Material:
     - _FresnelStrength: 2
     - _NoiseContrast: 1.09
     - _NoiseStrength: 0.374
-    - _NoiseTiling1: 1.2
+    - _NoiseTiling1: 0.46
     - _NoiseTiling2: 2.3
     - _Opacity: 0.736
     - _Softness: 0.3
     - _ViewFadePower: 2.5
-    - _WorldNoiseScale: 0.08
+    - _WorldNoiseScale: 0
     m_Colors:
     - _BaseColor: {r: 0.26034173, g: 0.32145482, b: 0.3886792, a: 1}
-    - _Scroll1: {r: -0.01, g: 0, b: 0, a: 0}
-    - _Scroll2: {r: -0.025, g: -0.025, b: 0, a: 0}
-    - para: {r: 1.2, g: 2.3, b: 1, a: 1}
+    - _Scroll1: {r: -0.05, g: 0.05, b: 0, a: 0}
+    - _Scroll2: {r: -0.04, g: -0.04, b: 0, a: 0}
+    - para: {r: 1, g: 100, b: 1, a: 0.1}
   m_BuildTextureStacks: []

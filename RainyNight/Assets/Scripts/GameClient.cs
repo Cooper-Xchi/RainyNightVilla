@@ -7,6 +7,8 @@ using UnityEngine;
 
 public class GameClient : MonoBehaviour
 {
+    public static GameClient Instance { get; private set; }
+
     [Header("服务器配置")]
     [SerializeField] private string host = "127.0.0.1";
     [SerializeField] private int port = 5000;
@@ -15,26 +17,22 @@ public class GameClient : MonoBehaviour
     private NetworkStream _stream;
     private CancellationTokenSource _cts;
     private bool _isConnected = false;
+    private bool _isDisconnecting = false;
 
     public bool IsConnected => _isConnected;
 
-    private async void Start()
+    private async void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+
         await ConnectAsync();
-    }
-
-    private void Update()
-    {
-        // 按空格发送测试消息
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            SendMessageToServer("ping");
-        }
-
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            SendMessageToServer("time");
-        }
     }
 
     public async Task ConnectAsync()
@@ -55,6 +53,7 @@ public class GameClient : MonoBehaviour
 
             _stream = _client.GetStream();
             _isConnected = true;
+            _isDisconnecting = false;
 
             Debug.Log("[Client] 连接服务器成功。");
 
@@ -102,7 +101,7 @@ public class GameClient : MonoBehaviour
 
         try
         {
-            while (!token.IsCancellationRequested && _client != null && _client.Connected)
+            while (!token.IsCancellationRequested && _client != null)
             {
                 int len = await _stream.ReadAsync(buffer, 0, buffer.Length, token);
 
@@ -135,35 +134,52 @@ public class GameClient : MonoBehaviour
         catch (OperationCanceledException)
         {
         }
+        catch (ObjectDisposedException)
+        {
+        }
         catch (Exception ex)
         {
-            Debug.LogError($"[Client] 接收异常: {ex.Message}");
+            if (!_isDisconnecting)
+            {
+                Debug.LogError($"[Client] 接收异常: {ex.Message}");
+            }
         }
         finally
         {
-            Disconnect();
+            if (!_isDisconnecting)
+            {
+                Disconnect();
+            }
         }
     }
 
     private void HandleServerMessage(string msg)
     {
         Debug.Log($"[Client] 收到服务端消息: {msg}");
-
-        // 后面你可以在这里做协议分发
-        // 比如：
-        // if (msg == "pong") { ... }
     }
 
     public void Disconnect()
     {
-        if (!_isConnected && _client == null)
+        if (_isDisconnecting)
             return;
 
+        _isDisconnecting = true;
         _isConnected = false;
 
         try { _cts?.Cancel(); } catch { }
+
+        try
+        {
+            if (_client != null && _client.Client != null && _client.Client.Connected)
+            {
+                _client.Client.Shutdown(SocketShutdown.Both);
+            }
+        }
+        catch { }
+
         try { _stream?.Close(); } catch { }
         try { _client?.Close(); } catch { }
+        try { _cts?.Dispose(); } catch { }
 
         _stream = null;
         _client = null;
@@ -172,13 +188,17 @@ public class GameClient : MonoBehaviour
         Debug.Log("[Client] 已断开连接。");
     }
 
-    private void OnDestroy()
+    private void OnApplicationQuit()
     {
         Disconnect();
     }
 
-    private void OnApplicationQuit()
+    private void OnDestroy()
     {
-        Disconnect();
+        if (Instance == this)
+        {
+            Disconnect();
+            Instance = null;
+        }
     }
 }

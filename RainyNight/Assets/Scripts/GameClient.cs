@@ -10,8 +10,8 @@ public class GameClient : MonoBehaviour
     public static GameClient Instance { get; private set; }
 
     [Header("服务器配置")]
-    [SerializeField] private string host = "127.0.0.1";
-    [SerializeField] private int port = 5000;
+    [SerializeField] private string host = "139.227.85.49";
+    [SerializeField] private int port = 33389;
 
     private TcpClient _client;
     private NetworkStream _stream;
@@ -57,6 +57,9 @@ public class GameClient : MonoBehaviour
 
             Debug.Log("[Client] 连接服务器成功。");
 
+            // 向服务器发送连接成功消息
+            await SendMessageToServer("连接成功");
+
             _ = ReceiveLoopAsync(_cts.Token);
         }
         catch (Exception ex)
@@ -66,7 +69,9 @@ public class GameClient : MonoBehaviour
         }
     }
 
-    public async void SendMessageToServer(string msg)
+    public async 
+    Task
+SendMessageToServer(string msg)
     {
         if (!_isConnected || _stream == null)
         {
